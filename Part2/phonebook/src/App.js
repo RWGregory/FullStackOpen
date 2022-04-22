@@ -1,15 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ContactForm from './ContactForm'
 import Directory from './Directory'
 import Filter from './Filter'
+import axios from 'axios'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '404-346-6643' },
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState([])
   const [newQuery, setNewQuery] = useState('')
+  console.log(persons)
+
+  useEffect(() => {
+    axios.get('http://localhost:3001/persons').then((response) => {
+      setPersons(response.data)
+    })
+  }, [])
 
   const regex = new RegExp(newQuery, 'i')
 
