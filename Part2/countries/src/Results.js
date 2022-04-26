@@ -7,7 +7,9 @@ const Results = ({ newQuery, countryData }) => {
   const countryCapital = countryData.map((country) => country.capital)
   const countryRegion = countryData.map((country) => country.region)
   const countryFlags = countryData.map((country) => country.flags.svg)
-  const countryLanguages = countryData.map((country) => country.languages)
+  const countryLanguages = Object.values(
+    countryData.map((country) => country.languages),
+  )
 
   const regex = new RegExp(newQuery, 'i')
   const filteredNames = countryNames.filter((country) => country.match(regex))
