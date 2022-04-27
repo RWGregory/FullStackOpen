@@ -1,7 +1,7 @@
 import React from 'react'
 
-const Directory = ({ mapPersons }) => {
-  return <div>{mapPersons}</div>
+const Directory = ({ mapContacts }) => {
+  return <div>{mapContacts}</div>
 }
 
 export default Directory

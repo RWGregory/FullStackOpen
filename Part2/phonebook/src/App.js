@@ -2,24 +2,24 @@ import { useState, useEffect } from 'react'
 import ContactForm from './ContactForm'
 import Directory from './Directory'
 import Filter from './Filter'
-import axios from 'axios'
+import contactService from './services/contacts.js'
 
 const App = () => {
-  const [persons, setPersons] = useState([])
+  const [contacts, setContacts] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState([])
   const [newQuery, setNewQuery] = useState('')
-  console.log(persons)
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then((response) => {
-      setPersons(response.data)
-    })
+    contactService.getContacts().then((response) => setContacts(response.data))
   }, [])
 
   const regex = new RegExp(newQuery, 'i')
-
-  const names = persons.map((person) => person.name)
+  const newContact = {
+    name: newName,
+    number: newNumber,
+  }
+  const names = contacts.map((contact) => contact.name)
 
   const handleClick = (e) => {
     e.preventDefault()
@@ -27,7 +27,9 @@ const App = () => {
       alert(`${newName} is already added to phonebook`)
       return
     }
-    setPersons(persons.concat({ name: newName, number: newNumber }))
+    contactService
+      .addContact(newContact)
+      .then((response) => setContacts(contacts.concat(response.data)))
     setNewName('')
     setNewNumber([])
   }
@@ -44,11 +46,22 @@ const App = () => {
     }
   }
 
-  const filteredPersons = persons.filter((person) => person.name.match(regex))
+  const handleRemove = (e) => {
+    window.confirm(`Delete ${e.target.name}?`)
+    contactService.removeContact(e.target.id)
+    contactService.getContacts().then((response) => setContacts(response.data))
+  }
 
-  const mapPersons = filteredPersons.map((person) => (
-    <div key={person.name}>
-      {person.name} {person.number}
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.match(regex),
+  )
+
+  const mapContacts = filteredContacts.map((contact) => (
+    <div key={contact.id}>
+      {contact.name} {contact.number}
+      <button id={contact.id} name={contact.name} onClick={handleRemove}>
+        Remove
+      </button>
     </div>
   ))
 
@@ -65,7 +78,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Directory mapPersons={mapPersons} />
+      <Directory mapContacts={mapContacts} />
     </div>
   )
 }
