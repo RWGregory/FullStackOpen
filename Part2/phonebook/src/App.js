@@ -21,10 +21,23 @@ const App = () => {
   }
   const names = contacts.map((contact) => contact.name)
 
-  const handleClick = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     if (names.includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
+      const indexOfName = names.indexOf(newName)
+      const filteredContacts = (phonebook) =>
+        phonebook.filter((contact, index) => phonebook[index] !== newContact)
+      window.confirm(
+        `${newName} is already added to phonebook. Click OK to replace the old number.`,
+      )
+      contactService
+        .editContact(contacts[indexOfName].id, newContact)
+        .then((response) => {
+          contactService
+            .getContacts()
+            .then((response) => setContacts(response.data))
+          console.log(response)
+        })
       return
     }
     contactService
@@ -44,12 +57,18 @@ const App = () => {
       case 'filter':
         setNewQuery(e.target.value)
     }
+    console.log(e)
   }
 
   const handleRemove = (e) => {
-    window.confirm(`Delete ${e.target.name}?`)
-    contactService.removeContact(e.target.id)
-    contactService.getContacts().then((response) => setContacts(response.data))
+    if (window.confirm(`Delete ${e.target.name}?`)) {
+      contactService.removeContact(e.target.id).then((response) => {
+        contactService
+          .getContacts()
+          .then((response) => setContacts(response.data))
+        console.log(response)
+      })
+    }
   }
 
   const filteredContacts = contacts.filter((contact) =>
@@ -74,7 +93,7 @@ const App = () => {
       <ContactForm
         newName={newName}
         handleChange={handleChange}
-        handleClick={handleClick}
+        handleClick={handleSubmit}
       />
 
       <h2>Numbers</h2>
